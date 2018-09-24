@@ -28,5 +28,8 @@ curl -kLo kubectl-linux-amd64-v1.11.1 https://$IP_PUB:8443/api/cli/kubectl-linux
 curl -kLo helm-linux-amd64-v2.9.1.tar.gz https://$IP_PUB:8443/api/cli/helm-linux-amd64.tar.gz
 curl -kLo istioctl-linux-amd64-v1.0.0 https://$IP_PUB:8443/api/cli/istioctl-linux-amd64
 
-# End of script
-touch /root/script_fin_`date "+%Y%m%d"`
+# Directory setting
+mkdir -p /microclimate/mc-data
+mkdir -p /microclimate/mc-jenkins
+chmod 777 /microclimate/mc-data
+chmod 777 /microclimate/mc-jenkins
