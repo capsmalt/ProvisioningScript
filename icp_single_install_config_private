@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # Variables pre-setting
 ICP_PATH=/opt/icp310cn
