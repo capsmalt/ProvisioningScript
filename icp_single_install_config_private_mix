@@ -17,7 +17,7 @@ sed -i.bak -e "/2.2.2.9/d" $ICP_PATH/cluster/hosts
 sed -i.bak -e "/3.3.3.3/d" $ICP_PATH/cluster/hosts
 sed -i.bak -e "/^\[master\]$/a $IP" $ICP_PATH/cluster/hosts
 sed -i.bak -e "/^\[worker\]$/a $IP" $ICP_PATH/cluster/hosts
-sed -i.bak -e "/^\[proxy\]$/a $IP_PUB" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/^\[proxy\]$/a $IP" $ICP_PATH/cluster/hosts
 sed -i.bak s/'# cluster_lb_address: none'/'cluster_lb_address: '$IP_PUB''/ $ICP_PATH/cluster/config.yaml
 sed -i.bak s/'# proxy_lb_address: none'/'proxy_lb_address: '$IP_PUB''/ $ICP_PATH/cluster/config.yaml
 
