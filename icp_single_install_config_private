@@ -1,0 +1,36 @@
+
+# Variables pre-setting
+ICP_PATH=/opt/icp310cn
+IP=$(ifconfig eth0 | awk '/inet / {print $2}' | awk -F: '{print $2}')
+IP_PUB=$(ifconfig eth1 | awk '/inet / {print $2}' | awk -F: '{print $2}')
+
+# Cluster pre-setting
+cd $ICP_PATH/cluster
+sed -i.bak s/$IP/'# '$IP''/ /etc/hosts
+sed -i.bak s/127.0.1.1/'# 127.0.1.1'/ /etc/hosts
+sed -i.bak -e "$ a $IP\t$HOSTNAME" /etc/hosts
+sed -i.bak -e "/1.1.1.1/d" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/2.2.2.2/d" $ICP_PATH/cluster/hosts
+sed -i.bak -e /'\.''\.''\.'/d $ICP_PATH/cluster/hosts
+sed -i.bak -e "/2.2.2.9/d" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/3.3.3.3/d" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/^\[master\]$/a $IP" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/^\[worker\]$/a $IP" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/^\[proxy\]$/a $IP" $ICP_PATH/cluster/hosts
+sed -i.bak s/'# cluster_lb_address: none'/'cluster_lb_address: '$IP''/ $ICP_PATH/cluster/config.yaml
+sed -i.bak s/'# proxy_lb_address: none'/'proxy_lb_address: '$IP''/ $ICP_PATH/cluster/config.yaml
+
+# Deploy ICP Cluster
+docker run --net=host -t -e LICENSE=accept -v "$(pwd)":/installer/cluster ibmcom/icp-inception-amd64:3.1.0-ee install -vvv | tee install.log
+
+# Install CLI
+curl -kLo cloudctl-linux-amd64-3.1.0-715 https://$IP:8443/api/cli/cloudctl-linux-amd64
+curl -kLo kubectl-linux-amd64-v1.11.1 https://$IP:8443/api/cli/kubectl-linux-amd64
+curl -kLo helm-linux-amd64-v2.9.1.tar.gz https://$IP:8443/api/cli/helm-linux-amd64.tar.gz
+curl -kLo istioctl-linux-amd64-v1.0.0 https://$IP:8443/api/cli/istioctl-linux-amd64
+
+# Directory setting
+mkdir -p /microclimate/mc-data
+mkdir -p /microclimate/mc-jenkins
+chmod 777 /microclimate/mc-data
+chmod 777 /microclimate/mc-jenkins
