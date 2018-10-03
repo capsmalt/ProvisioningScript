@@ -5,9 +5,6 @@ ICP_PATH=/opt/icp310cn
 IP=$(ifconfig eth0 | awk '/inet / {print $2}' | awk -F: '{print $2}')
 IP_PUB=$(ifconfig eth1 | awk '/inet / {print $2}' | awk -F: '{print $2}')
 
-# Get MCM Klusterlet HelmChart
-scp -i ~/.ssh/id_rsa root@10.132.75.77:/work/mcm/mcm-3.1.0_x86.tgz .
-
 # Cluster pre-setting
 cd $ICP_PATH/cluster
 sed -i.bak s/$IP/'# '$IP''/ /etc/hosts
@@ -33,11 +30,13 @@ curl -kLo kubectl-linux-amd64-v1.11.1 https://$IP:8443/api/cli/kubectl-linux-amd
 curl -kLo helm-linux-amd64-v2.9.1.tar.gz https://$IP:8443/api/cli/helm-linux-amd64.tar.gz
 curl -kLo istioctl-linux-amd64-v1.0.0 https://$IP:8443/api/cli/istioctl-linux-amd64
 
+# Get MCM Klusterlet HelmChart
+scp -i id_rsa -oStrictHostKeyChecking=no root@10.132.75.77:/work/mcm/mcm-3.1.0_x86.tgz .
+
 # MCM Preparation
 cloudctl login -a https://$IP_PUB:8443 --skip-ssl-validation -u admin -p admin -c id-mycluster-account -n kube-system
 docker login https://mycluster.icp:8500/
 cloudctl catalog load-ppa-archive -a mcm-3.1.0_x86.tgz
-export HELM_HOME=~/.helm
 helm init --client-only
 helm repo update
 kubectl create secret tls myklusterlettillersecret --cert ~/.helm/cert.pem --key ~/.helm/key.pem -n kube-system
