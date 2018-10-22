@@ -2,6 +2,8 @@
 
 # Install the Klusterlet to Remote K8s Cluster (e.g. ICP K8s Cluster)
 
+scp root@10.132.75.77:/work/mcm/mcm-3.1.0_x86.tgz .
+
 IP=$(ifconfig eth0 | awk '/inet / {print $2}' | awk -F: '{print $2}')
 IP_PUB=$(ifconfig eth1 | awk '/inet / {print $2}' | awk -F: '{print $2}')
 
