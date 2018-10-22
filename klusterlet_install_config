@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Install the Klusterlet to Remote K8s Cluster (e.g. ICP K8s Cluster)
+
+IP=$(ifconfig eth0 | awk '/inet / {print $2}' | awk -F: '{print $2}')
+IP_PUB=$(ifconfig eth1 | awk '/inet / {print $2}' | awk -F: '{print $2}')
+
+docker login mycluster.icp:8500 -u admin -p admin
+cloudctl login -a https://$IP_PUB:8443 -u admin -p admin -n kube-system -c id-mycluster-account --skip-ssl-validation
+kubectl create secret tls myklusterlet-tiller-secret --cert ~/.helm/cert.pem --key ~/.helm/key.pem -n kube-system
+cloudctl catalog load-ppa-archive -a mcm-3.1.0_x86.tgz --registry mycluster.icp:8500
+
+# helm install xxx
