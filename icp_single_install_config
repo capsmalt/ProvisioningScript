@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # Variables pre-setting
 ICP_PATH=/opt/icp311cn
 IP=$(ifconfig eth0 | awk '/inet / {print $2}' | awk -F: '{print $2}')
