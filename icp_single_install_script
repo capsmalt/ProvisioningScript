@@ -1,0 +1,23 @@
+# Variables pre-setting
+ICP_PATH=/opt/icp311cn
+IP=$(ifconfig eth0 | awk '/inet / {print $2}' | awk -F: '{print $2}')
+IP_PUB=$(ifconfig eth1 | awk '/inet / {print $2}' | awk -F: '{print $2}')
+
+# Cluster pre-setting
+cd $ICP_PATH/cluster
+sed -i.bak s/$IP_PUB/'# '$IP_PUB''/ /etc/hosts
+sed -i.bak s/127.0.1.1/'# 127.0.1.1'/ /etc/hosts
+sed -i.bak -e "$ a $IP_PUB\t$HOSTNAME" /etc/hosts
+sed -i.bak -e "/1.1.1.1/d" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/2.2.2.2/d" $ICP_PATH/cluster/hosts
+sed -i.bak -e /'\.''\.''\.'/d $ICP_PATH/cluster/hosts
+sed -i.bak -e "/2.2.2.9/d" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/3.3.3.3/d" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/^\[master\]$/a $IP_PUB" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/^\[worker\]$/a $IP_PUB" $ICP_PATH/cluster/hosts
+sed -i.bak -e "/^\[proxy\]$/a $IP_PUB" $ICP_PATH/cluster/hosts
+sed -i.bak s/'# cluster_lb_address: none'/'cluster_lb_address: '$IP_PUB''/ $ICP_PATH/cluster/config.yaml
+sed -i.bak s/'# proxy_lb_address: none'/'proxy_lb_address: '$IP_PUB''/ $ICP_PATH/cluster/config.yaml
+
+# Deploy ICP Cluster
+docker run --net=host -t -e LICENSE=accept -v "$(pwd)":/installer/cluster ibmcom/icp-inception-amd64:3.1.1-ee install -vvv | tee install.log
