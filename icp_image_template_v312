@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Install the python and socat
+ICP_PATH=/opt/icp312cn
+apt update
+apt install -y python-minimal
+apt install -y socat
+
+# Install the Docker engine
+cd /root
+/root/icp-docker-18.03.1_x86_64.bin --install
+systemctl start docker
+#systemctl status docker
+sed -i.bak s/max-size=50m/max-size=10m/ /lib/systemd/system/docker.service
+systemctl daemon-reload
+systemctl restart docker
+
+# Exstract the ICP images for installation (as docker images)
+tar xf ibm-cloud-private-x86_64-3.1.2.tar.gz -O | docker load
+
+# Prepare some settings before installation
+mkdir $ICP_PATH; cd $ICP_PATH
+docker run -v $(pwd):/data -e LICENSE=accept ibmcom/icp-inception-amd64:3.1.2-ee cp -r cluster /data
+mkdir $ICP_PATH/cluster/images
+mv /root/ibm-cloud-private-x86_64-3.1.2.tar.gz $ICP_PATH/cluster/images
+ssh-keygen -b 4096 -f /root/.ssh/id_rsa -N ""
+cat /root/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys
+cp /root/.ssh/id_rsa $ICP_PATH/cluster/ssh_key
