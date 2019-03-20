@@ -8,6 +8,7 @@ apt install -y socat
 
 # Install the Docker engine
 cd /root
+chmod +x icp-docker-18.03.1_x86_64.bin
 /root/icp-docker-18.03.1_x86_64.bin --install
 systemctl start docker
 #systemctl status docker
